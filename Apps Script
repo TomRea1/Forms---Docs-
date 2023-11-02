@@ -22,10 +22,10 @@ function autoFillGoogleDocFromForm(e){
 
   // run through all keywords + replace with google sheets data (linked to forms)
   var counter = 0;
-  for (var i in keywords){
+  keywords.forEach(function(value){
     counter = counter + 1;
     body.replaceText("{{" + i + "}}", e.values[counter]);
-  };
+  });
 
   // replace outliers (sometimes in template 'ly' is after the var to fit in a sentence {{spelling}}ly)
   body.replaceText("considerblely", "considerably");
