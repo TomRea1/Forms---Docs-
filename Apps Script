@@ -1,0 +1,47 @@
+
+
+function autoFillGoogleDocFromForm(e){
+
+  //List containing replacement variables used in google docs template 
+  var keywords = [    "title", "name", "number", "email", "job", "datestart", "role", "compwork",
+    "software", "others", "difficulties", "strengths", "instructions", "manuals",
+    "documents", "recall", "concentrating", "spelling", "writing", "thoughts",
+    "drafting", "writing_memos", "writing_reports", "notetaking", "planning",
+    "deadlines", "ordering", "working", "remembering"
+  ];
+
+  //Create variables for the template doc and the folder in which to place responses 
+  var templateFile = DriveApp.getFileById("12EhN_26q2mpeo8AGQGKrFnTirOd-a2FOCl-KS0ofqA8");
+  var templateResponseFolder = DriveApp.getFolderById("1_VbOB-FqrUyHgolfAummYUJJfWrqGQO-");
+
+  //Make new copy in the response folder, open the new doc, access the body of text within it
+  var copy = templateFile.makeCopy(e.values[2], templateResponseFolder);
+  var doc = DocumentApp.openById(copy.getId());
+  var identification = copy.getId();
+  var body = doc.getBody();
+
+  // run through all keywords + replace with google sheets data (linked to forms)
+  var counter = 0;
+  for (var i in keywords){
+    counter = counter + 1;
+    body.replaceText("{{" + i + "}}", e.values[counter]);
+  };
+
+  // replace outliers (sometimes in template 'ly' is after the var to fit in a sentence {{spelling}}ly)
+  body.replaceText("considerblely", "considerably");
+
+
+  //save changes 
+  doc.saveAndClose();
+
+
+
+  var recipientEmail = "";
+  var subject = "New Form Response : " + e.values[2];
+  var body = "Please find the attached Google Doc";
+  
+  var file = DriveApp.getFileById(identification);
+  
+  GmailApp.sendEmail(recipientEmail, subject, body,{ attachments: [file.getAs(MimeType.PDF)], name: "Tom"});
+
+}
